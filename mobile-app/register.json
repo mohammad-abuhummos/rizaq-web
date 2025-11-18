@@ -1,0 +1,814 @@
+Here's the full api of register and please fix any issues if you see
+"/api/registration/start": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartRegistrationResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartRegistrationResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartRegistrationResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/1": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step1AccountDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step1AccountDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step1AccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/verify-otp": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/2": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step2RoleDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step2RoleDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step2RoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/{registrationId}": {
+      "get": {
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStatusResponseApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStatusResponseApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationStatusResponseApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/3/farmer": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3FarmerDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3FarmerDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3FarmerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/3/trader": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TraderDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TraderDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TraderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/3/transporter": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TransporterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TransporterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3TransporterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/3/gov": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3GovDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3GovDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3GovDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/3/agri": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3AgriServiceDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3AgriServiceDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Step3AgriServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration/step/4/document": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "RegistrationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "DocType": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "Number": {
+                    "type": "string"
+                  },
+                  "IssuedBy": {
+                    "type": "string"
+                  },
+                  "ExpiryDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "RegistrationId": {
+                  "style": "form"
+                },
+                "DocType": {
+                  "style": "form"
+                },
+                "Number": {
+                  "style": "form"
+                },
+                "IssuedBy": {
+                  "style": "form"
+                },
+                "ExpiryDate": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/4/documents/{registrationId}": {
+      "get": {
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/4/document/{documentId}": {
+      "delete": {
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/4/complete": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/5/payout": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPayoutAccountDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPayoutAccountDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPayoutAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/5/payout/{registrationId}": {
+      "get": {
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "name": "registrationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/5/payout/{payoutId}/default": {
+      "patch": {
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "name": "payoutId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/step/5/complete": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/registration/submit": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }

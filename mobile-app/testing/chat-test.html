@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatHub Tester</title>
+  <!-- SignalR browser client (primary CDN) -->
+  <!--<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@2.4.3/dist/browser/signalr.min.js" crossorigin="anonymous"></script>-->
+  <script src="/lib/microsoft/signalr/dist/browser/signalr.min.js" crossorigin="anonymous"></script>
+  <!-- Fallback CDN -->
+  <script>
+    if (!window.signalR) {
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/@microsoft/signalr@8.0.5/dist/browser/signalr.min.js';
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    }
+  </script>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    fieldset { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; }
+    label { display: inline-block; min-width: 150px; }
+    input[type="text"], input[type="number"] { width: 320px; padding: 6px; }
+    .row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+    button { padding: 6px 10px; cursor: pointer; }
+    #log { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border: 1px solid #ccc; padding: 8px; min-height: 180px; max-height: 320px; overflow: auto; }
+    .ok { color: #15803d; }
+    .err { color: #b91c1c; }
+  </style>
+  <script>
+    let connection = null;
+
+    function log(msg, cls) {
+      const el = document.getElementById('log');
+      const line = document.createElement('div');
+      if (cls) line.className = cls;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function connect() {
+      if (connection && connection.state === "Connected") {
+        log('Already connected', 'ok');
+        return;
+      }
+
+      const baseUrl = document.getElementById('baseUrl').value.trim() || window.location.origin;
+      const token = document.getElementById('jwt').value.trim();
+      const hubUrl = `${baseUrl.replace(/\/$/, '')}/hubs/chat`;
+
+      connection = new signalR.HubConnectionBuilder()
+        .withUrl(hubUrl, token ? { accessTokenFactory: () => token } : undefined)
+        .withAutomaticReconnect()
+        .build();
+
+      // Server → Client handlers from IChatClient
+      connection.on('MessageCreated', (evt) => {
+        log(`MessageCreated: ${JSON.stringify(evt)}`, 'ok');
+      });
+      connection.on('MessagesRead', (evt) => {
+        log(`MessagesRead: ${JSON.stringify(evt)}`, 'ok');
+      });
+      connection.on('ConversationCreated', (evt) => {
+        log(`ConversationCreated: ${JSON.stringify(evt)}`, 'ok');
+      });
+      connection.on('Error', (err) => {
+        log(`Error: ${JSON.stringify(err)}`, 'err');
+      });
+
+      connection.onreconnecting(err => log(`Reconnecting... ${err?.message ?? ''}`));
+      connection.onreconnected(id => log(`Reconnected. ConnId=${id}`, 'ok'));
+      connection.onclose(err => log(`Connection closed ${err ? ': ' + err.message : ''}`));
+
+      try {
+        await connection.start();
+        log('Connected to ChatHub', 'ok');
+      } catch (e) {
+        log(`Connect failed: ${e.message}`, 'err');
+      }
+    }
+
+    async function disconnect() {
+      try {
+        if (connection) {
+          await connection.stop();
+          log('Disconnected', 'ok');
+        }
+      } catch (e) {
+        log(`Disconnect failed: ${e.message}`, 'err');
+      }
+    }
+
+    async function joinConv() {
+      const convId = Number(document.getElementById('conversationId').value);
+      if (!connection || connection.state !== 'Connected') return log('Not connected', 'err');
+      if (!convId) return log('conversationId required', 'err');
+      try {
+        await connection.invoke('JoinConversation', convId);
+        log(`Joined conversation ${convId}`, 'ok');
+      } catch (e) {
+        log(`Join failed: ${e.message}`, 'err');
+      }
+    }
+
+    async function leaveConv() {
+      const convId = Number(document.getElementById('conversationId').value);
+      if (!connection || connection.state !== 'Connected') return log('Not connected', 'err');
+      if (!convId) return log('conversationId required', 'err');
+      try {
+        await connection.invoke('LeaveConversation', convId);
+        log(`Left conversation ${convId}`, 'ok');
+      } catch (e) {
+        log(`Leave failed: ${e.message}`, 'err');
+      }
+    }
+
+    async function sendMsg() {
+      const convId = Number(document.getElementById('conversationId').value);
+      const sender = Number(document.getElementById('senderUserId').value);
+      const body = document.getElementById('body').value;
+      if (!connection || connection.state !== 'Connected') return log('Not connected', 'err');
+      if (!convId || !sender || !body) return log('conversationId, senderUserId, body required', 'err');
+      try {
+        await connection.invoke('SendMessage', { conversationId: convId, senderUserId: sender, body });
+        log(`Sent: ${body}`, 'ok');
+      } catch (e) {
+        log(`Send failed: ${e.message}`, 'err');
+      }
+    }
+
+    async function markRead() {
+      const convId = Number(document.getElementById('conversationId').value);
+      if (!connection || connection.state !== 'Connected') return log('Not connected', 'err');
+      if (!convId) return log('conversationId required', 'err');
+      try {
+        await connection.invoke('MarkAsRead', convId);
+        log(`MarkAsRead sent for conversation ${convId}`, 'ok');
+      } catch (e) {
+        log(`MarkAsRead failed: ${e.message}`, 'err');
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>ChatHub Tester</h1>
+
+  <fieldset>
+    <legend>Connection</legend>
+    <div class="row"><label for="baseUrl">Base URL</label><input id="baseUrl" type="text" placeholder="https://alhal.awnak.net" /></div>
+    <div class="row"><label for="jwt">JWT (optional)</label><input id="jwt" type="text" placeholder="paste Bearer token (optional)" /></div>
+    <div class="row">
+      <button onclick="connect()">Connect</button>
+      <button onclick="disconnect()">Disconnect</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Conversation</legend>
+    <div class="row"><label for="conversationId">Conversation Id</label><input id="conversationId" type="number" /></div>
+    <div class="row">
+      <button onclick="joinConv()">Join Conversation</button>
+      <button onclick="leaveConv()">Leave Conversation</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Send Message</legend>
+    <div class="row"><label for="senderUserId">Sender User Id</label><input id="senderUserId" type="number" /></div>
+    <div class="row"><label for="body">Body</label><input id="body" type="text" placeholder="Hello" /></div>
+    <div class="row"><button onclick="sendMsg()">Send</button></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Read</legend>
+    <div class="row"><button onclick="markRead()">Mark As Read</button></div>
+  </fieldset>
+
+  <h3>Log</h3>
+  <div id="log"></div>
+</body>
+</html>
+
+

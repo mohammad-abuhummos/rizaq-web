@@ -1,0 +1,455 @@
+"/api/direct/listings": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateListingDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateListingDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateListingDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    },
+    "get": {
+      "tags": [
+        "DirectSales"
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/listings/{id}": {
+    "get": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    },
+    "put": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateListingDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateListingDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateListingDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateOrderDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateOrderDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateOrderDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders/{id}": {
+    "get": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders/{id}/status": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderStatusDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderStatusDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderStatusDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/buyers/{buyerUserId}/orders": {
+    "get": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "buyerUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/sellers/{sellerUserId}/orders": {
+    "get": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "sellerUserId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/listings/{id}/status": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SetListingStatusDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SetListingStatusDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/SetListingStatusDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/listings/{id}/cancel": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelListingDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelListingDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelListingDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders/{id}/address": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderAddressDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderAddressDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderAddressDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders/{id}/qty": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderQtyDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderQtyDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateOrderQtyDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    }
+  },
+  "/api/direct/orders/{id}/cancel": {
+    "post": {
+      "tags": [
+        "DirectSales"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelOrderDto"
+            }
+          },
+          "text/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelOrderDto"
+            }
+          },
+          "application/*+json": {
+            "schema": {
+              "$ref": "#/components/schemas/CancelOrderDto"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK"
+        }
+      }
+    

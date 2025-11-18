@@ -1,15 +1,94 @@
 @import "tailwindcss";
+@import "swiper/css";
+@import "swiper/css/pagination";
+
+/* Cairo Font Family */
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/fonts/Cairo-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans: "Cairo", "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-gray-50 dark:bg-gray-950;
+  font-family: "Cairo", sans-serif;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #16a34a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #15803d;
 }

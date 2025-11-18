@@ -9,12 +9,17 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@microsoft/signalr": "^8.0.17",
     "@react-router/node": "^7.9.2",
     "@react-router/serve": "^7.9.2",
     "isbot": "^5.1.31",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router": "^7.9.2"
+    "react-hook-form": "^7.65.0",
+    "react-router": "^7.9.2",
+    "swiper": "^12.0.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@react-router/dev": "^7.9.2",
