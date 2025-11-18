@@ -38,6 +38,16 @@ export interface OpenAuction {
     minIncrement: number;
     currentPrice: number | null;
     cropId: number;
+    sellerUserId?: number;
+    maxPrice?: number;
+    /**
+     * Product main image URL
+     */
+    productMainImage?: string | null;
+    /**
+     * Product card color in hex format (e.g., #FF0000)
+     */
+    productCardColor?: string | null;
     /**
      * Optional images linked directly to the auction (if the API exposes them).
      */
