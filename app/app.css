@@ -92,3 +92,31 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #15803d;
 }
+
+/* Ensure input text is always black */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+textarea {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+/* Ensure autofill text is black */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}
+
+/* Placeholder text color */
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}

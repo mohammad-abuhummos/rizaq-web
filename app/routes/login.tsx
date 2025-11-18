@@ -151,12 +151,12 @@ export default function Login() {
                   type="text"
                   {...register("emailOrPhone")}
                   placeholder="أدخل البريد الإلكتروني أو رقم الهاتف"
-                  className={`w-full px-4 py-3 text-right border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                  className={`w-full px-4 py-3 text-right border rounded-lg bg-white text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
                     errors.emailOrPhone
                       ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300 focus:ring-green-500 focus:border-green-500"
                   }`}
-                  style={{ fontFamily: 'Cairo, sans-serif' }}
+                  style={{ fontFamily: 'Cairo, sans-serif', color: '#111827' }}
                   dir="rtl"
                 />
                 {errors.emailOrPhone && (
@@ -178,12 +178,12 @@ export default function Login() {
                     type={showPassword ? "text" : "password"}
                     {...register("password")}
                     placeholder="أدخل كلمة المرور"
-                    className={`w-full px-4 py-3 pr-12 text-right border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 ${
+                    className={`w-full px-4 py-3 pr-12 text-right border rounded-lg bg-white text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
                       errors.password
                         ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                         : "border-gray-300 focus:ring-green-500 focus:border-green-500"
                     }`}
-                    style={{ fontFamily: 'Cairo, sans-serif' }}
+                    style={{ fontFamily: 'Cairo, sans-serif', color: '#111827' }}
                     dir="rtl"
                   />
                   <button
