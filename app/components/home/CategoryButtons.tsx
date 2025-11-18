@@ -130,26 +130,24 @@ export function CategoryButtons({ onCategoryChange }: CategoryButtonsProps) {
   }
 
   return (
-    <div className="px-4 py-4 border-b border-gray-200 bg-white">
-      <div className="flex gap-3">
-        {categories.slice(0, 2).map((category) => {
-          const isSelected = category.categoryId === selectedCategoryId;
-          const label = getDisplayName(category.nameAr, category.nameEn);
-          return (
-            <button
-              key={category.categoryId}
-              onClick={() => handleCategoryClick(category.categoryId)}
-              className={`flex-1 rounded-2xl px-4 py-3.5 text-base font-bold transition-all duration-300 ${
-                isSelected
-                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg transform scale-105'
-                  : 'bg-white text-gray-800 hover:bg-gray-50 border-2 border-gray-200 hover:border-green-300 shadow-sm'
-              }`}
-            >
-              {label || 'قسم'}
-            </button>
-          );
-        })}
-      </div>
+    <div className="flex gap-3 pb-2">
+      {categories.map((category) => {
+        const isSelected = category.categoryId === selectedCategoryId;
+        const label = getDisplayName(category.nameAr, category.nameEn);
+        return (
+          <button
+            key={category.categoryId}
+            onClick={() => handleCategoryClick(category.categoryId)}
+            className={`flex-none rounded-2xl px-6 py-3 text-sm font-bold transition-all duration-300 ${
+              isSelected
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5'
+                : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-green-700 border border-gray-200 hover:border-green-200 shadow-sm hover:shadow-md'
+            }`}
+          >
+            {label || 'قسم'}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -10,4 +10,11 @@ export default [
   route("register/details", "routes/register/details.tsx"),
   route("register/documents", "routes/register/documents.tsx"),
   route("register/payout", "routes/register/payout.tsx"),
+  
+  // Auction Routes
+  route("auctions", "routes/auctions._index.tsx"),
+  route("auctions/new", "routes/auctions.new.tsx"),
+  route("auctions/:auctionId", "routes/auctions.$auctionId.tsx"),
+  route("auctions/:auctionId/join", "routes/auctions.$auctionId.join.tsx"),
+  route("auctions/:auctionId/edit", "routes/auctions.$auctionId.edit.tsx"),
 ] satisfies RouteConfig;

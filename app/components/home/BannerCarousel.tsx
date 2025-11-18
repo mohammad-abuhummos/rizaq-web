@@ -35,7 +35,7 @@ export function BannerCarousel({ data, onBannerPress }: BannerCarouselProps) {
       >
         {data.map((banner) => (
           <SwiperSlide key={banner.id}>
-            <div className="relative h-full mx-4 rounded-2xl overflow-hidden">
+            <div className="relative h-full rounded-2xl overflow-hidden">
               <img
                 src={banner.image}
                 alt={banner.title}

@@ -142,7 +142,7 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
   }
 
   return (
-    <div className="px-4 py-2 space-y-8">
+    <div className="py-2 space-y-8">
       {/* Auctions Tab */}
       <div>
         <div className="flex items-center justify-between mb-6">

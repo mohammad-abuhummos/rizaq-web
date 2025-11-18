@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 
 export function PromoCard() {
   return (
-    <div className="relative mx-4 mb-6 rounded-2xl overflow-hidden h-36 shadow-xl">
+    <div className="relative mb-6 rounded-2xl overflow-hidden h-36 shadow-xl">
       <img
         src="https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=800"
         alt="بيع محاصيلك"

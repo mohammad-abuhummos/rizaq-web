@@ -87,20 +87,23 @@ const services: Service[] = [
 
 export function ServicesCardContainer() {
   return (
-    <div className="mb-6 px-4">
+    <div className="mb-6">
       <div className="mb-4">
         <h2 className="text-xl font-bold text-gray-900 text-right">خدماتنا</h2>
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-4">
         {services.map((service) => {
           const content = (
-            <div className="group w-full aspect-square bg-white rounded-xl p-4 flex flex-col items-center justify-center border-2 border-gray-200 hover:border-green-500 hover:shadow-lg hover:shadow-green-100 transition-all duration-300 cursor-pointer transform hover:scale-105">
-              <div className="mb-3 transform group-hover:scale-110 transition-transform duration-300">
-                {service.icon}
+            <div className="group w-full aspect-square bg-white rounded-2xl p-3 flex flex-col items-center justify-center shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10 flex flex-col items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gray-50 group-hover:bg-white group-hover:shadow-sm flex items-center justify-center transition-all duration-300">
+                  {service.icon}
+                </div>
+                <p className="text-xs text-gray-700 text-center font-bold group-hover:text-green-700 transition-colors px-1 leading-tight">
+                  {service.title}
+                </p>
               </div>
-              <p className="text-xs text-gray-800 text-center font-bold group-hover:text-green-600 transition-colors">
-                {service.title}
-              </p>
             </div>
           );
 
