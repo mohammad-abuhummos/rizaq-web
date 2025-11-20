@@ -17,4 +17,14 @@ export default [
   route("auctions/:auctionId", "routes/auctions.$auctionId.tsx"),
   route("auctions/:auctionId/join", "routes/auctions.$auctionId.join.tsx"),
   route("auctions/:auctionId/edit", "routes/auctions.$auctionId.edit.tsx"),
+
+  // Direct Selling (Listings) Routes
+  route("direct-selling", "routes/direct-selling._index.tsx"),
+  route("direct-selling/new", "routes/direct-selling.new.tsx"),
+  route("direct-selling/:id", "routes/direct-selling.$id.tsx"),
+
+  // Tender Routes
+  route("tenders", "routes/tenders._index.tsx"),
+  route("tenders/new", "routes/tenders.new.tsx"),
+  route("tenders/:id", "routes/tenders.$id.tsx"),
 ] satisfies RouteConfig;
