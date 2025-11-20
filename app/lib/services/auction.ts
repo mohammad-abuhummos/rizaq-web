@@ -8,8 +8,28 @@ export async function createAuction(createdByUserId: number, dto: CreateAuctionD
     });
 }
 
-export async function getOpenAuctions() {
-    return http.get<OpenAuction[]>('/api/auctions/open');
+export async function getOpenAuctions(page?: number, pageSize?: number) {
+    const params = new URLSearchParams();
+    if (page !== undefined) params.append('page', page.toString());
+    if (pageSize !== undefined) params.append('pageSize', pageSize.toString());
+    
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return http.get<OpenAuction[]>(`/api/auctions/open${query}`);
+}
+
+export async function getOpenAuctionsPaginated(page: number = 1, pageSize: number = 9) {
+    const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString()
+    });
+    
+    return http.get<{
+        items: OpenAuction[];
+        totalCount: number;
+        currentPage: number;
+        pageSize: number;
+        totalPages: number;
+    }>(`/api/auctions/open?${params.toString()}`);
 }
 
 export async function getAuctionById(auctionId: number) {

@@ -27,4 +27,11 @@ export default [
   route("tenders", "routes/tenders._index.tsx"),
   route("tenders/new", "routes/tenders.new.tsx"),
   route("tenders/:id", "routes/tenders.$id.tsx"),
+
+  // Chat & Messages Routes
+  route("messages", "routes/messages.tsx"),
+  route("chat/:conversationId", "routes/chat.$conversationId.tsx"),
+
+  // Notifications Route
+  route("notifications", "routes/notifications.tsx"),
 ] satisfies RouteConfig;

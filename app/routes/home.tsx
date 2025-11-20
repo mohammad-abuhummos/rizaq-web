@@ -7,6 +7,8 @@ import { CategoryButtons } from "../components/home/CategoryButtons";
 import { HomeTabs } from "../components/home/HomeTabs";
 import { ServicesCardContainer } from "../components/home/ServicesCardContainer";
 import { PromoCard } from "../components/home/PromoCard";
+import { NotificationPermissionPrompt } from "../components/NotificationPermissionPrompt";
+import { useAutoRegisterDevice } from "../hooks/useAutoRegisterDevice";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -58,6 +60,9 @@ export default function Home() {
     isActive: false,
   });
 
+  // Auto-register device when permission is granted
+  useAutoRegisterDevice();
+
   const handleSearch = useCallback((text: string) => {
     setSearchQuery(text);
   }, []);
@@ -79,6 +84,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
       <Header />
+      
+      {/* Notification Permission Prompt */}
+      <NotificationPermissionPrompt trigger="home" />
 
       {/* Main Layout with Sidebar */}
       <div className="max-w-7xl mx-auto px-4 py-6 overflow-hidden">

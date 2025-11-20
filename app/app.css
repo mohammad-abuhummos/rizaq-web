@@ -68,6 +68,8 @@ html,
 body {
   @apply bg-gray-50 dark:bg-gray-950;
   font-family: "Cairo", sans-serif;
+  direction: rtl;
+  text-align: right;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;

@@ -5,7 +5,8 @@ import { getAuctionById, listBidsByAuctionId } from '~/lib/services/auction';
 import { getCropById } from '~/lib/services/crop';
 import { getAuthUser } from '~/lib/storage/auth-storage';
 import { CountdownTimer } from '~/components/CountdownTimer';
-import type { AuctionDetail, CropDetail } from '~/lib/types/auction'; // Assuming CropDetail is in auction types or similar
+import type { AuctionDetail } from '~/lib/types/auction';
+import type { CropDetail } from '~/lib/types/crop';
 import { HubConnectionBuilder, LogLevel, type HubConnection } from "@microsoft/signalr";
 
 export default function AuctionJoin() {
@@ -89,8 +90,7 @@ export default function AuctionJoin() {
         if (connectionRef.current || !auction || !userId) return;
 
         // Use configured base URL or default
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'; 
-        // Adjust based on your config
+        const baseUrl = import.meta.env.VITE_API_URL || 'https://alhal.awnak.net'; 
         
         const conn = new HubConnectionBuilder()
             .withUrl(`${baseUrl}/hubs/auctions`)

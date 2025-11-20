@@ -1,15 +1,19 @@
 import { Link, useLocation } from "react-router";
 import { useAuth } from "~/hooks/useAuth";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { Fragment } from 'react';
+import { listUserConversations, type ChatConversationSummary } from '~/lib/services/chat';
+import { getAuthUser } from '~/lib/storage/auth-storage';
 
 export function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [conversations, setConversations] = useState<ChatConversationSummary[]>([]);
+  const [loadingChats, setLoadingChats] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,6 +37,72 @@ export function Header() {
     await logout();
     setShowUserMenu(false);
   };
+
+  const formatRelativeTime = useCallback((iso?: string) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const diff = Date.now() - date.getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+
+    if (diff < minute) return 'الآن';
+    if (diff < hour) {
+      const minutes = Math.floor(diff / minute);
+      return minutes <= 1 ? 'قبل دقيقة' : `قبل ${minutes} دقائق`;
+    }
+    if (diff < day) {
+      const hours = Math.floor(diff / hour);
+      return hours <= 1 ? 'قبل ساعة' : `قبل ${hours} ساعات`;
+    }
+
+    const days = Math.floor(diff / day);
+    return days <= 1 ? 'أمس' : `قبل ${days} أيام`;
+  }, []);
+
+  const fetchConversations = useCallback(async () => {
+    if (!isAuthenticated) return;
+
+    setLoadingChats(true);
+    try {
+      const auth = await getAuthUser<{ userId?: number; id?: number }>();
+      const userId = auth?.userId ?? auth?.id;
+      
+      if (!userId) return;
+
+      const res = await listUserConversations(Number(userId));
+      const raw = (res as any)?.data ?? res;
+      const nested = (raw as any)?.data ?? raw;
+      const items = Array.isArray(nested) ? nested : Array.isArray(raw) ? raw : [];
+
+      // Sort by most recent and take top 3
+      const sorted = items.sort((a: ChatConversationSummary, b: ChatConversationSummary) => {
+        const aTime = new Date(a.lastMessageAt || a.updatedAt || a.openedAt).getTime();
+        const bTime = new Date(b.lastMessageAt || b.updatedAt || b.openedAt).getTime();
+        return bTime - aTime;
+      });
+
+      setConversations(sorted.slice(0, 3));
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+      setConversations([]);
+    } finally {
+      setLoadingChats(false);
+    }
+  }, [isAuthenticated]);
+
+  // Fetch conversations when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchConversations();
+      
+      // Refresh every 30 seconds
+      const interval = setInterval(fetchConversations, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchConversations]);
 
   return (
     <>
@@ -234,14 +304,21 @@ export function Header() {
 
                   {/* Chat Dropdown */}
                   <Menu as="div" className="relative hidden md:block">
-                    <Menu.Button className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <Menu.Button 
+                      className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={fetchConversations}
+                    >
                       <ChatBubbleLeftRightIcon className="h-6 w-6" />
                       {/* Message Badge */}
-                      <span className="absolute top-1 right-1 flex h-4 w-4">
-                        <span className="relative inline-flex rounded-full h-4 w-4 bg-blue-500 items-center justify-center">
-                          <span className="text-white text-[10px] font-bold" style={{ fontFamily: 'Cairo, sans-serif' }}>2</span>
+                      {conversations.length > 0 && (
+                        <span className="absolute top-1 right-1 flex h-4 w-4">
+                          <span className="relative inline-flex rounded-full h-4 w-4 bg-blue-500 items-center justify-center">
+                            <span className="text-white text-[10px] font-bold" style={{ fontFamily: 'Cairo, sans-serif' }}>
+                              {conversations.filter(c => (c.unreadCount || 0) > 0).length || conversations.length}
+                            </span>
+                          </span>
                         </span>
-                      </span>
+                      )}
                     </Menu.Button>
                     <Transition
                       as={Fragment}
@@ -257,79 +334,71 @@ export function Header() {
                           <h3 className="text-sm font-bold text-gray-900" style={{ fontFamily: 'Cairo, sans-serif' }}>المحادثات</h3>
                         </div>
                         <div className="max-h-96 overflow-y-auto">
-                          {/* Sample Chats */}
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div className={`px-4 py-3 ${active ? 'bg-gray-50' : ''} cursor-pointer border-b border-gray-100`}>
-                                <div className="flex gap-3">
-                                  <div className="shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-green-600 to-emerald-600 flex items-center justify-center text-white font-bold text-sm" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      أ
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                      <p className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                        أحمد محمد
-                                      </p>
-                                      <span className="text-xs text-gray-400" style={{ fontFamily: 'Cairo, sans-serif' }}>منذ 10 دقائق</span>
-                                    </div>
-                                    <p className="text-xs text-gray-600 mt-1 truncate" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      مرحباً، هل المنتج متوفر؟
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div className={`px-4 py-3 ${active ? 'bg-gray-50' : ''} cursor-pointer border-b border-gray-100`}>
-                                <div className="flex gap-3">
-                                  <div className="shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-600 to-blue-600 flex items-center justify-center text-white font-bold text-sm" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      م
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                      <p className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                        محمد علي
-                                      </p>
-                                      <span className="text-xs text-gray-400" style={{ fontFamily: 'Cairo, sans-serif' }}>منذ ساعة</span>
-                                    </div>
-                                    <p className="text-xs text-gray-600 mt-1 truncate" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      شكراً لك على المساعدة
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <div className={`px-4 py-3 ${active ? 'bg-gray-50' : ''} cursor-pointer`}>
-                                <div className="flex gap-3">
-                                  <div className="shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      س
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                      <p className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                        سارة أحمد
-                                      </p>
-                                      <span className="text-xs text-gray-400" style={{ fontFamily: 'Cairo, sans-serif' }}>منذ 3 ساعات</span>
-                                    </div>
-                                    <p className="text-xs text-gray-600 mt-1 truncate" style={{ fontFamily: 'Cairo, sans-serif' }}>
-                                      ما هي طريقة الدفع المتاحة؟
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </Menu.Item>
+                          {loadingChats ? (
+                            <div className="px-4 py-8 text-center">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                              <p className="text-xs text-gray-500" style={{ fontFamily: 'Cairo, sans-serif' }}>جاري التحميل...</p>
+                            </div>
+                          ) : conversations.length === 0 ? (
+                            <div className="px-4 py-8 text-center">
+                              <svg className="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                              <p className="text-sm text-gray-500" style={{ fontFamily: 'Cairo, sans-serif' }}>لا توجد محادثات</p>
+                            </div>
+                          ) : (
+                            conversations.map((conversation, index) => {
+                              // Better gradient colors
+                              const gradientColors = [
+                                'bg-gradient-to-br from-green-500 to-emerald-600',
+                                'bg-gradient-to-br from-blue-500 to-indigo-600',
+                                'bg-gradient-to-br from-purple-500 to-pink-600',
+                              ];
+                              const colorClass = gradientColors[index % gradientColors.length];
+                              const firstLetter = conversation.counterpartName?.charAt(0) || conversation.contextType?.charAt(0) || 'م';
+                              const title = conversation.counterpartName || `محادثة ${conversation.contextType}`;
+                              const preview = conversation.lastMessageBody?.substring(0, 50) || 'لا توجد رسائل';
+                              const timeSource = conversation.lastMessageAt || conversation.updatedAt || conversation.openedAt;
+                              const hasUnread = (conversation.unreadCount || 0) > 0;
+
+                              return (
+                                <Menu.Item key={conversation.conversationId}>
+                                  {({ active }) => (
+                                    <Link
+                                      to={`/chat/${conversation.conversationId}`}
+                                      className={`block px-4 py-3 ${active ? 'bg-gray-50' : ''} ${hasUnread ? 'bg-blue-50' : ''} ${index < conversations.length - 1 ? 'border-b border-gray-100' : ''}`}
+                                    >
+                                      <div className="flex gap-3">
+                                        <div className="shrink-0 relative">
+                                          <div className={`w-10 h-10 rounded-full ${colorClass} flex items-center justify-center text-white font-bold text-sm shadow-md`} style={{ fontFamily: 'Cairo, sans-serif' }}>
+                                            {firstLetter}
+                                          </div>
+                                          {hasUnread && (
+                                            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                              <span className="text-white text-[10px] font-bold">{conversation.unreadCount}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center justify-between">
+                                            <p className="text-sm font-semibold text-gray-900 truncate" style={{ fontFamily: 'Cairo, sans-serif' }}>
+                                              {title}
+                                            </p>
+                                            <span className="text-xs text-gray-400 mr-2" style={{ fontFamily: 'Cairo, sans-serif' }}>
+                                              {formatRelativeTime(timeSource)}
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-gray-600 mt-1 truncate" style={{ fontFamily: 'Cairo, sans-serif' }}>
+                                            {preview}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  )}
+                                </Menu.Item>
+                              );
+                            })
+                          )}
                         </div>
                         <div className="p-3 border-t border-gray-200">
                           <Link
