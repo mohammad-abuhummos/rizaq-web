@@ -348,7 +348,7 @@ export default function ChatConversationPage() {
 
       {/* Chat Header */}
       <div className="bg-white border-b border-gray-200 py-4 px-6">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/messages')}
@@ -381,7 +381,7 @@ export default function ChatConversationPage() {
 
       {/* Error Message */}
       {error && !loading && (
-        <div className="max-w-5xl mx-auto w-full px-6 py-3">
+        <div className="w-full px-6 py-3">
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,7 +401,7 @@ export default function ChatConversationPage() {
 
       {/* Conversation Info */}
       {conversation && (
-        <div className="max-w-5xl mx-auto w-full px-6 py-3">
+        <div className="w-full px-6 py-3">
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function ChatConversationPage() {
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="max-w-5xl mx-auto px-6 py-6">
+        <div className="w-full px-6 py-6">
           {loading && messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
@@ -483,7 +483,7 @@ export default function ChatConversationPage() {
 
       {/* Input Area */}
       <div className="bg-white border-t border-gray-200 py-4 px-6">
-        <div className="max-w-5xl mx-auto flex items-end gap-3">
+        <div className="w-full flex items-end gap-3">
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

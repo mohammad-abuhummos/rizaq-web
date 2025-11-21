@@ -153,7 +153,7 @@ export default function AuctionsIndex() {
       
       {/* Notification Permission Prompt */}
       <NotificationPermissionPrompt trigger="auction" />
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
@@ -196,8 +196,8 @@ export default function AuctionsIndex() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {auctions.map((auction) => (
-                <AuctionCard key={auction.auctionId} auction={auction} />
+                 {auctions.map((auction, index) => (
+                <AuctionCard key={auction.auctionId} auction={auction} index={index} />
                  ))}
             </div>
 

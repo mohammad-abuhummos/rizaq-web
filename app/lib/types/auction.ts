@@ -57,6 +57,12 @@ export interface OpenAuction {
      * (The API returns `images: string[]` in the payload.)
      */
     images?: string[] | null;
+
+    // Additional fields for UI display
+    quantity?: number | string | null;
+    unit?: string | null;
+    location?: string | null;
+    bidCount?: number | null;
 }
 
 export interface AuctionDetail {

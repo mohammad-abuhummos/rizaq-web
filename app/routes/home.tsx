@@ -89,7 +89,7 @@ export default function Home() {
       <NotificationPermissionPrompt trigger="home" />
 
       {/* Main Layout with Sidebar */}
-      <div className="max-w-7xl mx-auto px-4 py-6 overflow-hidden">
+      <div className="w-full px-4 py-6 overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-6">
 
           {/* Main Content Area */}

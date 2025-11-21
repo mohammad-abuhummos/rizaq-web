@@ -10,6 +10,9 @@ export interface DirectListing {
     maxOrderQty?: number | null;
     location?: string | null;
     status?: string | null;
+    productMainImage?: string | null;
+    productCardColor?: string | null;
+    images?: string[] | null;
 }
 
 export interface CreateListingDto {

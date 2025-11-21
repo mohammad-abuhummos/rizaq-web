@@ -8,6 +8,9 @@ import type { Tender } from '~/lib/types/tender';
 import type { DirectListing } from '~/lib/types/direct';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { AuctionCard } from './AuctionCard';
+import { TenderCard } from './TenderCard';
+import { DirectListingCard } from './DirectListingCard';
+import { GovernmentPricingSection } from './GovernmentPricingSection';
 
 interface CategoryFilterState {
   categoryId: number | null;
@@ -28,6 +31,26 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
   const [loading, setLoading] = useState(true);
   const isLoadingRef = useRef(false);
   const isMountedRef = useRef(true);
+  // Auction carousel refs and state
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  
+  // Tender carousel refs and state
+  const tenderCarouselRef = useRef<HTMLDivElement>(null);
+  const [tenderCurrentPage, setTenderCurrentPage] = useState(0);
+  const [tenderCanScrollLeft, setTenderCanScrollLeft] = useState(false);
+  const [tenderCanScrollRight, setTenderCanScrollRight] = useState(true);
+  
+  // Direct listing carousel refs and state
+  const listingCarouselRef = useRef<HTMLDivElement>(null);
+  const [listingCurrentPage, setListingCurrentPage] = useState(0);
+  const [listingCanScrollLeft, setListingCanScrollLeft] = useState(false);
+  const [listingCanScrollRight, setListingCanScrollRight] = useState(true);
+  
+  // Cards visible per page based on screen size
+  const cardsPerPage = 4; // 4 cards per page on desktop
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -57,9 +80,9 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
 
         // Only update state if component is still mounted
         if (isMountedRef.current) {
-          setAuctions(Array.isArray(auctionsRes.data) ? auctionsRes.data.slice(0, 3) : []);
-          setTenders(Array.isArray(tendersRes.data) ? tendersRes.data.slice(0, 3) : []);
-          setListings(Array.isArray(listingsRes.data) ? listingsRes.data.slice(0, 3) : []);
+          setAuctions(Array.isArray(auctionsRes.data) ? auctionsRes.data.slice(0, 10) : []);
+          setTenders(Array.isArray(tendersRes.data) ? tendersRes.data.slice(0, 10) : []);
+          setListings(Array.isArray(listingsRes.data) ? listingsRes.data.slice(0, 10) : []);
           setLoading(false);
         }
       } catch (error) {
@@ -75,6 +98,279 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
     loadData();
   }, [refreshKey]);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(auctions.length / cardsPerPage);
+
+  // Check scroll position
+  const checkScrollPosition = () => {
+    if (!carouselRef.current) return;
+    
+    const container = carouselRef.current;
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const absScroll = Math.abs(scrollLeft);
+    
+    // Check if we need scrolling at all
+    const needsScrolling = scrollWidth > clientWidth;
+    
+    if (!needsScrolling) {
+      // All cards fit in one page, disable both arrows
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      setCurrentPage(0);
+      return;
+    }
+    
+    // Update arrow states
+    setCanScrollLeft(absScroll > 1); // Can scroll left if not at start
+    setCanScrollRight(absScroll < maxScroll - 1); // Can scroll right if not at end
+    
+    // Calculate current page
+    const cardWidth = 280 + 24;
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentPageIndex = Math.round(absScroll / scrollAmount);
+    setCurrentPage(Math.min(Math.max(currentPageIndex, 0), Math.max(0, totalPages - 1)));
+  };
+
+  // Initialize scroll position check
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    // Initial check after render and layout calculation
+    const initCheck = () => {
+      // Reset scroll to start
+      container.scrollLeft = 0;
+      // Check position after a delay to ensure layout is calculated
+      setTimeout(checkScrollPosition, 200);
+    };
+    
+    // Wait for next frame to ensure layout is calculated
+    requestAnimationFrame(() => {
+      initCheck();
+    });
+    
+    // Listen for scroll events
+    container.addEventListener('scroll', checkScrollPosition, { passive: true });
+    window.addEventListener('resize', checkScrollPosition);
+
+    return () => {
+      container.removeEventListener('scroll', checkScrollPosition);
+      window.removeEventListener('resize', checkScrollPosition);
+    };
+  }, [auctions.length, totalPages]);
+
+  // Scroll handlers - Fixed to work correctly
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    if (!carouselRef.current) return;
+    
+    const container = carouselRef.current;
+    const cardWidth = 280 + 24; // card width + gap
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentScroll = container.scrollLeft;
+    
+    // Calculate new scroll position
+    let newScroll: number;
+    if (direction === 'right') {
+      // Scroll right (next page) - move forward
+      newScroll = currentScroll + scrollAmount;
+    } else {
+      // Scroll left (previous page) - move backward
+      newScroll = Math.max(0, currentScroll - scrollAmount);
+    }
+    
+    // Scroll to new position
+    container.scrollTo({ left: newScroll, behavior: 'smooth' });
+    
+    // Update state after scroll animation
+    setTimeout(() => {
+      checkScrollPosition();
+    }, 300);
+  };
+
+  const goToPage = (pageIndex: number) => {
+    if (!carouselRef.current) return;
+    
+    const container = carouselRef.current;
+    const cardWidth = 280 + 24;
+    const scrollAmount = pageIndex * cardsPerPage * cardWidth;
+    
+    container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+    setTimeout(checkScrollPosition, 100);
+  };
+
+  // Tender carousel functions
+  const checkTenderScrollPosition = () => {
+    if (!tenderCarouselRef.current) return;
+    
+    const container = tenderCarouselRef.current;
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const absScroll = Math.abs(scrollLeft);
+    
+    const needsScrolling = scrollWidth > clientWidth;
+    
+    if (!needsScrolling) {
+      setTenderCanScrollLeft(false);
+      setTenderCanScrollRight(false);
+      setTenderCurrentPage(0);
+      return;
+    }
+    
+    setTenderCanScrollLeft(absScroll > 1);
+    setTenderCanScrollRight(absScroll < maxScroll - 1);
+    
+    const cardWidth = 280 + 24;
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentPageIndex = Math.round(absScroll / scrollAmount);
+    const totalPages = Math.ceil(tenders.length / cardsPerPage);
+    setTenderCurrentPage(Math.min(Math.max(currentPageIndex, 0), Math.max(0, totalPages - 1)));
+  };
+
+  const scrollTenderCarousel = (direction: 'left' | 'right') => {
+    if (!tenderCarouselRef.current) return;
+    
+    const container = tenderCarouselRef.current;
+    const cardWidth = 280 + 24;
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentScroll = container.scrollLeft;
+    
+    let newScroll: number;
+    if (direction === 'right') {
+      newScroll = currentScroll + scrollAmount;
+    } else {
+      newScroll = Math.max(0, currentScroll - scrollAmount);
+    }
+    
+    container.scrollTo({ left: newScroll, behavior: 'smooth' });
+    setTimeout(() => {
+      checkTenderScrollPosition();
+    }, 300);
+  };
+
+  const goToTenderPage = (pageIndex: number) => {
+    if (!tenderCarouselRef.current) return;
+    
+    const container = tenderCarouselRef.current;
+    const cardWidth = 280 + 24;
+    const scrollAmount = pageIndex * cardsPerPage * cardWidth;
+    
+    container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+    setTimeout(checkTenderScrollPosition, 100);
+  };
+
+  // Direct listing carousel functions
+  const checkListingScrollPosition = () => {
+    if (!listingCarouselRef.current) return;
+    
+    const container = listingCarouselRef.current;
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const maxScroll = Math.max(0, scrollWidth - clientWidth);
+    const absScroll = Math.abs(scrollLeft);
+    
+    const needsScrolling = scrollWidth > clientWidth;
+    
+    if (!needsScrolling) {
+      setListingCanScrollLeft(false);
+      setListingCanScrollRight(false);
+      setListingCurrentPage(0);
+      return;
+    }
+    
+    setListingCanScrollLeft(absScroll > 1);
+    setListingCanScrollRight(absScroll < maxScroll - 1);
+    
+    const cardWidth = 280 + 24;
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentPageIndex = Math.round(absScroll / scrollAmount);
+    const totalPages = Math.ceil(listings.length / cardsPerPage);
+    setListingCurrentPage(Math.min(Math.max(currentPageIndex, 0), Math.max(0, totalPages - 1)));
+  };
+
+  const scrollListingCarousel = (direction: 'left' | 'right') => {
+    if (!listingCarouselRef.current) return;
+    
+    const container = listingCarouselRef.current;
+    const cardWidth = 280 + 24;
+    const scrollAmount = cardsPerPage * cardWidth;
+    const currentScroll = container.scrollLeft;
+    
+    let newScroll: number;
+    if (direction === 'right') {
+      newScroll = currentScroll + scrollAmount;
+    } else {
+      newScroll = Math.max(0, currentScroll - scrollAmount);
+    }
+    
+    container.scrollTo({ left: newScroll, behavior: 'smooth' });
+    setTimeout(() => {
+      checkListingScrollPosition();
+    }, 300);
+  };
+
+  const goToListingPage = (pageIndex: number) => {
+    if (!listingCarouselRef.current) return;
+    
+    const container = listingCarouselRef.current;
+    const cardWidth = 280 + 24;
+    const scrollAmount = pageIndex * cardsPerPage * cardWidth;
+    
+    container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+    setTimeout(checkListingScrollPosition, 100);
+  };
+
+  // Initialize tender carousel
+  useEffect(() => {
+    const container = tenderCarouselRef.current;
+    if (!container) return;
+
+    const initCheck = () => {
+      container.scrollLeft = 0;
+      setTimeout(checkTenderScrollPosition, 200);
+    };
+    
+    requestAnimationFrame(() => {
+      initCheck();
+    });
+    
+    container.addEventListener('scroll', checkTenderScrollPosition, { passive: true });
+    window.addEventListener('resize', checkTenderScrollPosition);
+
+    return () => {
+      container.removeEventListener('scroll', checkTenderScrollPosition);
+      window.removeEventListener('resize', checkTenderScrollPosition);
+    };
+  }, [tenders.length]);
+
+  // Initialize listing carousel
+  useEffect(() => {
+    const container = listingCarouselRef.current;
+    if (!container) return;
+
+    const initCheck = () => {
+      container.scrollLeft = 0;
+      setTimeout(checkListingScrollPosition, 200);
+    };
+    
+    requestAnimationFrame(() => {
+      initCheck();
+    });
+    
+    container.addEventListener('scroll', checkListingScrollPosition, { passive: true });
+    window.addEventListener('resize', checkListingScrollPosition);
+
+    return () => {
+      container.removeEventListener('scroll', checkListingScrollPosition);
+      window.removeEventListener('resize', checkListingScrollPosition);
+    };
+  }, [listings.length]);
+
   if (loading) {
     return (
       <div className="px-4 py-8 flex justify-center">
@@ -85,22 +381,110 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
 
   return (
     <div className="py-2 space-y-8">
+      {/* Government Pricing Section */}
+      <GovernmentPricingSection />
+
       {/* Auctions Tab */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-900">المزادات</h3>
-          <Link to="/auctions" className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
+          <Link to="/auctions" className="text-sm font-bold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
             عرض الكل
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            </svg> */}
           </Link>
         </div>
         {auctions.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {auctions.map((auction) => (
-              <AuctionCard key={auction.auctionId} auction={auction} />
-            ))}
+          <div className="relative">
+            {/* Right Arrow (Scroll Right - Next Cards) */}
+            <button
+              onClick={() => scrollCarousel('right')}
+              disabled={!canScrollRight}
+              className={`absolute right-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                canScrollRight 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Left Arrow (Scroll Left - Previous Cards) */}
+            <button
+              onClick={() => scrollCarousel('left')}
+              disabled={!canScrollLeft}
+              className={`absolute left-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                canScrollLeft 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Carousel Container - Only scrollable via arrows */}
+            <div 
+              ref={carouselRef}
+              className="overflow-x-auto overflow-y-hidden scrollbar-hide carousel-scroll pb-4 -mx-4 px-4"
+                      style={{
+                direction: 'ltr',
+                scrollBehavior: 'smooth',
+                touchAction: 'none',
+                overscrollBehavior: 'none'
+              }}
+              onWheel={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+            >
+              <div className="flex gap-6" style={{ direction: 'rtl', willChange: 'transform' }}>
+                {auctions.map((auction, index) => (
+                  <div key={auction.auctionId} className="flex-shrink-0 w-[280px]">
+                    <AuctionCard auction={auction} index={index} />
+                  </div>
+                ))}
+                          </div>
+                        </div>
+
+            {/* Pagination Dots */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center mt-6 gap-2">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                    <button
+                    key={index}
+                    onClick={() => goToPage(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      currentPage === index 
+                        ? 'bg-[#00741b] w-8' 
+                        : 'bg-[#cfcdd3] hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to page ${index + 1}`}
+                  />
+                ))}
+                  </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -118,42 +502,103 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
       <div>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-900">المناقصات</h3>
-          <Link to="/tenders" className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
+          <Link to="/tenders" className="text-sm font-bold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
             عرض الكل
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            </svg> */}
           </Link>
         </div>
         {tenders.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {tenders.map((tender) => (
-              <Link
-                key={tender.tenderId}
-                to={`/tenders/${tender.tenderId}`}
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:border-purple-200 transition-all duration-300"
-              >
-                <div className="h-44 relative overflow-hidden rounded-t-2xl">
-                  <EmptyPlaceholder type="tender" />
-                  <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-700 rounded-full shadow-lg backdrop-blur-sm">
-                    <span className="text-xs text-white font-bold">مناقصة مفتوحة</span>
+          <div className="relative">
+            {/* Right Arrow */}
+            <button
+              onClick={() => scrollTenderCarousel('right')}
+              disabled={!tenderCanScrollRight}
+              className={`absolute right-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                tenderCanScrollRight 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Left Arrow */}
+            <button
+              onClick={() => scrollTenderCarousel('left')}
+              disabled={!tenderCanScrollLeft}
+              className={`absolute left-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                tenderCanScrollLeft 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Carousel Container */}
+            <div 
+              ref={tenderCarouselRef}
+              className="overflow-x-auto overflow-y-hidden scrollbar-hide carousel-scroll pb-4 -mx-4 px-4"
+              style={{ 
+                direction: 'ltr',
+                scrollBehavior: 'smooth',
+                touchAction: 'none',
+                overscrollBehavior: 'none'
+              }}
+              onWheel={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+            >
+              <div className="flex gap-6" style={{ direction: 'rtl', willChange: 'transform' }}>
+                {tenders.map((tender, index) => (
+                  <div key={tender.tenderId} className="flex-shrink-0 w-[280px]">
+                    <TenderCard tender={tender} index={index} />
                   </div>
-                </div>
-                <div className="p-4">
-                  <h4 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">
-                    {tender.title || tender.cropName || 'مناقصة زراعية'}
-                  </h4>
-                  <p className="text-sm text-gray-500 mb-2">
-                    الكمية: {tender.quantity?.toLocaleString() || '-'} {tender.unit || ''}
-                  </p>
-                  {tender.maxBudget && (
-                    <span className="text-lg font-bold text-green-600">
-                      {tender.maxBudget.toLocaleString()} ل.س
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Pagination Dots */}
+            {Math.ceil(tenders.length / cardsPerPage) > 1 && (
+              <div className="flex justify-center items-center mt-6 gap-2">
+                {Array.from({ length: Math.ceil(tenders.length / cardsPerPage) }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToTenderPage(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      tenderCurrentPage === index 
+                        ? 'bg-[#00741b] w-8' 
+                        : 'bg-[#cfcdd3] hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to page ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -171,40 +616,103 @@ export function HomeTabs({ refreshKey, categoryFilter, searchQuery }: HomeTabsPr
       <div>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-900">البيع المباشر</h3>
-          <Link to="/direct-selling" className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
+          <Link to="/direct-selling" className="text-sm font-bold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
             عرض الكل
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            </svg> */}
           </Link>
         </div>
         {listings.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {listings.map((listing) => (
-              <Link
-                key={listing.listingId}
-                to={`/direct-selling/${listing.listingId}`}
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300"
-              >
-                <div className="h-44 relative overflow-hidden rounded-t-2xl">
-                  <EmptyPlaceholder type="listing" />
-                  <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full shadow-lg backdrop-blur-sm">
-                    <span className="text-xs text-white font-bold">بيع مباشر</span>
+          <div className="relative">
+            {/* Right Arrow */}
+            <button
+              onClick={() => scrollListingCarousel('right')}
+              disabled={!listingCanScrollRight}
+              className={`absolute right-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                listingCanScrollRight 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Left Arrow */}
+            <button
+              onClick={() => scrollListingCarousel('left')}
+              disabled={!listingCanScrollLeft}
+              className={`absolute left-0 top-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                listingCanScrollLeft 
+                  ? 'bg-white text-[#00741b] hover:bg-gray-50 cursor-pointer' 
+                  : 'bg-white text-[#cfcdd3] cursor-not-allowed opacity-50'
+              }`}
+              style={{ transform: 'translateY(-50%)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Carousel Container */}
+            <div 
+              ref={listingCarouselRef}
+              className="overflow-x-auto overflow-y-hidden scrollbar-hide carousel-scroll pb-4 -mx-4 px-4"
+              style={{ 
+                direction: 'ltr',
+                scrollBehavior: 'smooth',
+                touchAction: 'none',
+                overscrollBehavior: 'none'
+              }}
+              onWheel={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }}
+            >
+              <div className="flex gap-6" style={{ direction: 'rtl', willChange: 'transform' }}>
+                {listings.map((listing, index) => (
+                  <div key={listing.listingId} className="flex-shrink-0 w-[280px]">
+                    <DirectListingCard listing={listing} index={index} />
                   </div>
-                </div>
-                <div className="p-4">
-                  <h4 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">
-                    {listing.title || listing.cropName || 'عرض للبيع المباشر'}
-                  </h4>
-                  <p className="text-sm text-gray-500 mb-2">
-                    الكمية المتاحة: {listing.availableQty?.toLocaleString() || '-'} {listing.unit || ''}
-                  </p>
-                  <span className="text-lg font-bold text-green-600">
-                    {listing.unitPrice?.toLocaleString() || '-'} ل.س / {listing.unit || 'وحدة'}
-                  </span>
-                </div>
-              </Link>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Pagination Dots */}
+            {Math.ceil(listings.length / cardsPerPage) > 1 && (
+              <div className="flex justify-center items-center mt-6 gap-2">
+                {Array.from({ length: Math.ceil(listings.length / cardsPerPage) }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToListingPage(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      listingCurrentPage === index 
+                        ? 'bg-[#00741b] w-8' 
+                        : 'bg-[#cfcdd3] hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to page ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-12">

@@ -149,7 +149,7 @@ export function Header() {
                   }`}
                 style={{ fontFamily: 'Cairo, sans-serif' }}
               >
-                المزادات
+              احدث المزايدات
                 <span className={`absolute bottom-0 right-0 h-0.5 bg-green-600 transition-all duration-300 ${isActive('/auctions') ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}></span>
               </Link>

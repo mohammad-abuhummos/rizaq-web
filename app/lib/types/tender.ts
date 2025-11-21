@@ -13,6 +13,9 @@ export interface Tender {
     startTime?: string | null;    // ISO date-time
     endTime?: string | null;      // ISO date-time
     status?: string | null;
+    productMainImage?: string | null;
+    productCardColor?: string | null;
+    images?: string[] | null;
 }
 
 export interface CreateTenderDto {

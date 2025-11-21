@@ -162,7 +162,7 @@ export default function CreateAuction() {
         <div className="min-h-screen bg-gray-50 pb-20">
             <Header />
             
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="w-full px-4 py-8">
                 {/* Header Section */}
                 <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl shadow-lg p-8 mb-8 text-center">
                     <h1 className="text-4xl font-bold text-white mb-2">إنشاء مزاد جديد</h1>
